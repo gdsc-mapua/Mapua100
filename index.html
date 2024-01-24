@@ -7,7 +7,7 @@
         <title>Mapúa University &ndash; Road to 100</title>
         <style>
             :root {
-                --header-height: 7vh;
+                --header-height: 16vh;
                 --font-scale: 15;
             }
 
@@ -45,7 +45,7 @@
             header > div {
                 color: #CAA452;
                 font-family: 'Montserrat';
-                font-size: 0.9vmin;
+                font-size: 2vmin;
             } 
 
             body {
@@ -104,6 +104,18 @@
                 text-transform: uppercase;
                 text-wrap: nowrap;
             }
+
+            footer > img {
+                width: auto;
+                height: 7vh;
+            }
+
+            footer {
+                text-align: left;
+                padding-left: 1vh;
+                background-color: rgba(255, 255, 255, 0.6);
+            }
+
         </style>
     </head>
     <body>
@@ -130,6 +142,13 @@
                 <span>seconds</span>
             </div>
         </main>
+
+        <footer>
+            <img src="images/logo-gdsc.png" alt="GDSC logo">
+            <img src="images/logo-mme.png" alt="MME logo">
+            <img src="images/logo-eece.png" alt="EECE logo">
+        </footer>
+
         <script>
             var dayCounter = document.getElementById("days");
             var hourCounter = document.getElementById("hours");
@@ -147,16 +166,19 @@
                 var minutes = Math.floor((delta % (1000 * 60 * 60)) / (1000 * 60));
                 var seconds = Math.floor((delta % (1000 * 60)) / 1000);
 
-                dayCounter.innerHTML = days;
-                hourCounter.innerHTML = hours;
-                minuteCounter.innerHTML = minutes;
-                secondCounter.innerHTML = seconds;
+                dayCounter.innerHTML = days < 10 ? `0${days}` : days;
+                hourCounter.innerHTML = hours < 10 ? `0${hours}` : hours;
+                minuteCounter.innerHTML = minutes < 10 ? `0${minutes}` : minutes;
+                secondCounter.innerHTML = seconds < 10 ? `0${seconds}` : seconds;
             }
 
             updateTime();
             setTimeout(() => {
                 setInterval(updateTime, 1000);
             }, Date.now() % 1000);
+
+            
+
         </script>
     </body>
 </html>
