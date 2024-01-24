@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Mapúa University &ndash; Road to 100</title>
+        <style>
+            :root {
+                --header-height: 76px;
+                --font-scale: 15;
+            }
+
+            @font-face {
+                font-family: 'Outfit';
+                font-weight: bold;
+                src: url('fonts/Outfit-Bold.ttf');
+            }
+
+            @font-face {
+                font-family: 'Outfit';
+                font-weight: lighter;
+                src: url('fonts/Outfit-Bold.ttf');
+            }
+
+            @font-face {
+                font-family: 'Outfit';
+                font-weight: normal;
+                src: url('fonts/Outfit-Regular.ttf');
+            }
+
+            header {
+                background-color: rgba(255, 255, 255, 0.6);
+            }
+
+            body {
+                margin: 0;
+                font-family: 'Outfit', 'Helvetica', sans-serif;
+                text-align: center;
+                background-color: black;
+                background-size: cover;
+            }
+
+            main {
+                height: calc(100vh - var(--header-height));
+                display: flex;
+                flex-wrap: wrap;
+                flex-direction: row;
+                justify-content: center;
+                align-content: center;
+            }
+
+            .break {
+                flex-basis: 100%;
+                height: calc(var(--font-scale) * 0.4vmin);
+            }
+
+            .counter {
+                font-size: calc(var(--font-scale) * 0.75vmin);
+                max-width: calc(var(--font-scale) * 1.5vw);
+                width: 100%;
+            }
+
+            .counter.days {
+                font-size: calc(var(--font-scale) * 1vmin);
+                max-width: calc(var(--font-scale) * 3vw);
+            }
+
+            .counter > span:nth-child(1) {
+                text-shadow: 0 1vmin 0.7vmin rgba(88, 88, 100, 95);
+                color: #FFB81D;
+                font-size: 1.5em;
+                font-weight: bold;
+                line-height: 0.8em;
+            }
+
+            .counter.days > span:nth-child(1) {
+                font-size: 2.4em;
+                color: #D9291C;
+            }
+
+            /* labels */
+            .counter > span:nth-child(2) {
+                color: white;
+                display: block;
+                font-size: 0.4em;
+                line-height: 1em;
+                text-transform: uppercase;
+                text-wrap: nowrap;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <img src="" alt="Mapúa University Centennial Logo">
+        </header>
+        <main>
+            <div class="counter days">
+                <span id="days">???</span>
+                <span>days to go</span>
+            </div>
+            <div class="break"></div>
+            <div class="counter">
+                <span id="hours">??</span>
+                <span>hours</span>
+            </div>
+            <div class="counter">
+                <span id="minutes">??</span>
+                <span>minutes</span>
+            </div>
+            <div class="counter">
+                <span id="seconds">??</span>
+                <span>seconds</span>
+            </div>
+        </main>
+        <script>
+            var dayCounter = document.getElementById("days");
+            var hourCounter = document.getElementById("hours");
+            var minuteCounter = document.getElementById("minutes");
+            var secondCounter = document.getElementById("seconds");
+
+            var endTimestamp = new Date("2025-01-25T00:00:00Z").getTime();
+            
+            function updateTime() {
+                var currentTimestamp = Date.now();
+                var delta = endTimestamp - currentTimestamp;
+
+                var days = Math.floor(delta / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((delta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((delta % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((delta % (1000 * 60)) / 1000);
+
+                dayCounter.innerHTML = days;
+                hourCounter.innerHTML = hours;
+                minuteCounter.innerHTML = minutes;
+                secondCounter.innerHTML = seconds;
+            }
+
+            updateTime();
+            setTimeout(() => {
+                setInterval(updateTime, 1000);
+            }, Date.now() % 1000);
+        </script>
+    </body>
+</html>
