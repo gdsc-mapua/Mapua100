@@ -2,13 +2,23 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="refresh" content="30">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Mapúa University &ndash; Road to 100</title>
         <style>
             :root {
-                --header-height: 16vh;
+                --header-height: 18vh;
+                --header-logo-ratio: 5;
+                --footer-height: 7vh;
                 --font-scale: 15;
+
+                --background-opacity: 0.6;
+                --hf-opacity: 0.6;
+            }
+
+            * {
+                box-sizing: border-box;
             }
 
             @font-face {
@@ -40,18 +50,30 @@
                 src: url('fonts/Oswald-Bold.ttf');
             }
 
+            .background-cover {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, var(--background-opacity));
+                z-index: -10;
+            }
+
             header {
-                background-color: rgba(255, 255, 255, 0.6);
+                background-color: rgba(255, 255, 255, var(--hf-opacity));
             }
 
             header > img {
-                height: calc(var(--header-height) - 4px);
-                padding: 2px 0;
-            } 
+                height: calc((var(--header-height) / var(--header-logo-ratio)) * (var(--header-logo-ratio) - 1));
+                padding: 4px;
+            }
+
             header > div {
                 color: #CAA452;
                 font-family: 'Montserrat';
-                font-size: 2vmin;
+                font-size: calc(var(--header-height) / var(--header-logo-ratio));
+                line-height: 1em;
             } 
 
             body {
@@ -63,13 +85,12 @@
             }
 
             main {
-                height: calc(100vh - var(--header-height));
+                height: calc(100vh - var(--header-height) - var(--footer-height) - 1vh);
                 display: flex;
                 flex-wrap: wrap;
                 flex-direction: row;
                 justify-content: center;
                 align-content: center;
-                background-color: rgba(0, 0, 0, 0.6);
             }
 
             .break {
@@ -83,8 +104,8 @@
                 width: 100%;
             }
 
-            .dayOfWeek, .days {
-                max-width: 100%;
+            .counter.dayOfWeek, .counter.days {
+                max-width: 100% !important;
             }
 
             .dayOfWeek {
@@ -147,20 +168,21 @@
                 color: #F6F6F6;
             }
 
-            footer > img {
-                width: auto;
-                height: 7vh;
-            }
-
             footer {
+                height: var(--footer-height);
                 text-align: left;
-                padding-left: 1vh;
-                background-color: rgba(255, 255, 255, 0.6);
+                background-color: rgba(255, 255, 255, var(--hf-opacity));
             }
 
+            footer > img {
+                padding: 0.5vmin 0 0.5vmin 0.5vmin;
+                width: auto;
+                height: var(--footer-height);
+            }
         </style>
     </head>
     <body>
+        <div class="background-cover"></div>
         <header>
             <div>ROAD TO</div>
             <img src="images/logo-centennial.png" alt="Mapúa University Centennial Logo">
