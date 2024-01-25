@@ -330,9 +330,8 @@
             fetchTimeOffset()
                 .then(() => {
                     updateTime();
-                    setTimeout(() => {
-                        setInterval(updateTime, 1000);
-                    }, offsetTime(Date.now()) % 1000);
+                    // 24 Hz
+                    setInterval(updateTime, 1000 / 24);
                 });
         </script>
 
