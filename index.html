@@ -15,6 +15,9 @@
 
                 --background-opacity: 0.6;
                 --hf-opacity: 0.6;
+
+                --mapua-yellow: #FFB81D;
+                --mapua-red: #D94230;
             }
 
             * {
@@ -79,7 +82,7 @@
                 text-transform: uppercase;
                 font-size: calc((var(--header-height) - var(--header-padding)) / var(--header-logo-ratio));
                 line-height: 1em;
-            } 
+            }
 
             body {
                 margin: 0;
@@ -90,7 +93,7 @@
             }
 
             main {
-                height: calc(100vh - var(--header-height) - var(--footer-height) - 1vh);
+                height: calc(100vh - var(--header-height) - var(--footer-height));
                 display: flex;
                 flex-wrap: wrap;
                 flex-direction: row;
@@ -109,20 +112,20 @@
                 width: 100%;
             }
 
-            .counter.dayOfWeek, .counter.days {
+            .counter.date, .counter.days {
                 max-width: 100% !important;
             }
 
-            .dayOfWeek {
+            .counter.date {
                 font-size: calc(var(--font-scale) * 0.6vmin);
             }
 
-            body:not(.countdown) .dayOfWeek,
+            body:not(.countdown) .date,
             body.countdown .days {
                 display: initial;
             }
 
-            body.countdown .dayOfWeek,
+            body.countdown .date,
             body:not(.countdown) .days {
                 display: none;
             }
@@ -134,7 +137,7 @@
 
             .counter > .number {
                 text-shadow: 0 1vmin 0.7vmin rgba(42, 42, 42, 0.95);
-                color: #FFB81D;
+                color: var(--mapua-yellow);
                 font-size: 1.5em;
                 font-weight: bold;
                 line-height: 0.8em;
@@ -142,10 +145,22 @@
 
             /* number */
             .counter.days > .number,
-            .counter.dayOfWeek > .number {
+            .counter.date > .number {
                 font-size: 2.4em;
-                color: #D9291C;
+                color: var(--mapua-red);
                 text-transform: uppercase;
+            }
+
+            .counter.date > .label {
+                margin-bottom: 2vh;
+            }
+
+            #dayOfWeek {
+                font-size: 1em;
+            }
+
+            #clockDate {
+                font-size: 1.4em;
             }
 
             /* labels */
@@ -155,10 +170,9 @@
                 font-size: 0.4em;
                 line-height: 1em;
                 text-transform: uppercase;
-                text-wrap: nowrap;
             }
 
-            body:not(.countdown) .counter:not(.dayOfWeek) > .label {
+            body:not(.countdown) .counter:not(.date) > .label {
                 display: none;
             }
 
@@ -197,8 +211,9 @@
                 <span class="number" id="days">???</span>
                 <span class="label">days to go</span>
             </div>
-            <div class="counter dayOfWeek">
+            <div class="counter date">
                 <span class="label">Today is</span>
+                <span class="number" id="clockDate">???</span><br/>
                 <span class="number" id="dayOfWeek">???</span>
             </div>
 
@@ -215,7 +230,7 @@
                 <span class="number" id="minutes">??</span>
                 <span class="label">minutes</span>
             </div>
-            
+
             <div class="colon">:</div>
 
             <div class="counter">
@@ -232,20 +247,21 @@
 
         <script>
             var body = document.getElementsByTagName("body")[0];
-            
+
             var timeOffset = 0;
 
-            var dayOfWeekCounter = document.getElementById("dayOfWeek");
+            var dayOfWeek = document.getElementById("dayOfWeek");
+            var clockDate = document.getElementById("clockDate");
             var dayCounter = document.getElementById("days");
             var hourCounter = document.getElementById("hours");
             var minuteCounter = document.getElementById("minutes");
             var secondCounter = document.getElementById("seconds");
-        
+
             var endTimestamp = new Date("2025-01-25T00:00:00+08:00").getTime();
             var transitionTimestamp = new Date("2024-01-25T19:26:00+08:00").getTime();
 
             /**
-             * @param {number} timestamp 
+             * @param {number} timestamp
              */
             function offsetTime(timestamp) {
                 return timestamp + timeOffset;
@@ -266,26 +282,25 @@
                     request.send();
                 });
             }
-        
+
             function updateTime() {
                 var currentTimestamp = offsetTime(Date.now());
                 var delta = endTimestamp - currentTimestamp;
-        
+
                 // Check if the specified condition is met
                 if (currentTimestamp < transitionTimestamp) {
                     body.classList.toggle("countdown", false);
-        
+
                     // Get the day of the week and display it in a new variable
                     var daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
                     var currentDate = new Date(offsetTime(Date.now()));
-                    var dayIndex = currentDate.getDay();
-                    var dayName = daysOfWeek[dayIndex];
 
-                    var hours = currentDate.getHours(); 
+                    var hours = currentDate.getHours();
                     var minutes = currentDate.getMinutes();
                     var seconds = currentDate.getSeconds();
-        
-                    dayOfWeekCounter.innerText = dayName;
+
+                    dayOfWeek.innerText = currentDate.toLocaleDateString("en-PH", { weekday: "long" });
+                    clockDate.innerText = currentDate.toLocaleDateString("en-PH", { dateStyle: "long" });
                     hourCounter.innerText = hours < 10 ? `0${hours}` : hours;
                     minuteCounter.innerText = minutes < 10 ? `0${minutes}` : minutes;
                     secondCounter.innerText = seconds < 10 ? `0${seconds}` : seconds;
@@ -296,7 +311,7 @@
                     var hours = Math.floor((delta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     var minutes = Math.floor((delta % (1000 * 60 * 60)) / (1000 * 60));
                     var seconds = Math.floor((delta % (1000 * 60)) / 1000);
-        
+
                     dayCounter.innerText = days < 10 ? `0${days}` : days;
                     hourCounter.innerText = hours < 10 ? `0${hours}` : hours;
                     minuteCounter.innerText = minutes < 10 ? `0${minutes}` : minutes;
@@ -312,7 +327,7 @@
                     }, offsetTime(Date.now()) % 1000);
                 });
         </script>
-        
-        
+
+
     </body>
 </html>
