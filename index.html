@@ -192,6 +192,15 @@
                 width: auto;
                 height: var(--footer-height);
             }
+
+            footer > img:not(.eece) {
+                border-radius: 1vmin;
+            }
+
+            footer > img.eece {
+                -webkit-filter: drop-shadow(1vmin 0.4vmin 0.6vmin #222);
+                filter: drop-shadow(1vmin 0.4vmin 0.6vmin #222);
+            }
         </style>
     </head>
     <body>
@@ -234,9 +243,9 @@
         </main>
 
         <footer>
-            <img src="images/logo-gdsc.png" alt="GDSC logo">
-            <img src="images/logo-mme.png" alt="MME logo">
-            <img src="images/logo-eece.png" alt="EECE logo">
+            <img src="images/logo-gdsc.png" alt="GDSC logo"><!--
+            --><img src="images/logo-mme.png" alt="MME logo"><!--
+            --><img class="eece" src="images/logo-eece.png" alt="EECE logo">
         </footer>
 
         <script>
