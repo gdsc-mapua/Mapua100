@@ -260,10 +260,15 @@
             var endTimestamp = new Date("2025-01-25T00:00:00+08:00").getTime();
             var transitionTimestamp = new Date("2024-01-25T19:26:00+08:00").getTime();
 
+            const testMode = new URLSearchParams(window.location.search).get("test") === '1';
+
             /**
              * @param {number} timestamp
              */
             function offsetTime(timestamp) {
+                if (testMode) {
+                    return timestamp;
+                }
                 return timestamp + timeOffset;
             }
 
