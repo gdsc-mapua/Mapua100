@@ -9,6 +9,11 @@ Pushes on the `main` branch are automatically deployed on GitHub Pages. See the
 [deployments](https://github.com/gdsc-mapua/Mapua100/deployments/github-pages)
 page for information on latest deployments.
 
+## Development
+The `index.html` is standalone and can be opened without the use of a web server.
+Simply open the file with your preferred text editor and browser to start editing
+and testing.
+
 ## Copyright
 Copyright © 2024, Google Developer Student Clubs – Mapúa Manila. All rights reserved.
 No part of this software may be copied, reproduced, distributed, published,
