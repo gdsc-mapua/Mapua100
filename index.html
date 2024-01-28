@@ -331,23 +331,36 @@
 
             function fetchTimeOffset() {
                 return new Promise(function (res, rej) {
+                    // Using an XHR here, *just in case* the TV does not support the
+                    // Fetch API. `fetch` would be much better.
                     var request = new XMLHttpRequest();
                     request.open("GET", "https://worldtimeapi.org/api/timezone/Asia/Manila", true);
+
+                    // Account for response time delay
+                    var loadStartTime;
+                    request.onreadystatechange = function () {
+                        if (request.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+                            loadStartTime = Date.now();
+                        }
+                    };
                     request.onload = function() {
                         if (this.status >= 200 && this.status < 400) {
                             var data = JSON.parse(this.response);
-                            timeOffset = new Date(data["utc_datetime"]) - new Date().getTime();
+                            var now = Date.now();
+                            timeOffset = new Date(data["utc_datetime"]) - now + (now - loadStartTime);
+                            console.log("Calculated delay: " + timeOffset + "ms");
+                            console.log("Request latency: " + (now - loadStartTime) + "ms");
                             res();
                         }
                         rej();
                     };
+
                     request.send();
                     setTimeout(rej, 10e3);
                 });
             }
 
             function updateClock() {
-                var daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
                 var currentDate = new Date(offsetTime(Date.now()));
 
                 var hours = currentDate.getHours();
