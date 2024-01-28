@@ -433,6 +433,7 @@
             var body = document.getElementsByTagName("body")[0];
             var bodyStyle = getComputedStyle(body);
 
+            var currentVersionSha;
             var timeOffset = 0;
             /** @type {"countdown"|"clock"} */
             var mode;
@@ -457,6 +458,44 @@
             var confettiPopped = false;
             var confettiCount = 0;
             var confettiMax = 100;
+
+            function getGitHubMainCommitSha() {
+                return new Promise(function (res, rej) {
+                    // Using an XHR here, *just in case* the TV does not support the
+                    // Fetch API. `fetch` would be much better.
+                    var request = new XMLHttpRequest();
+                    request.open("GET", "https://api.github.com/repos/gdsc-mapua/Mapua100/git/refs", true);
+
+                    request.onload = function() {
+                        if (this.status >= 200 && this.status < 400) {
+                            var data = JSON.parse(this.response);
+                            res(data[0]["object"]["sha"]);
+                        } else {
+                            console.error("Failed to get latest version from GitHub.");
+                            rej();
+                        }
+                    };
+
+                    request.send();
+                });
+            }
+
+            function checkForUpdates() {
+                if (!currentVersionSha) {
+                    // No SHA to base off of.
+                    return;
+                }
+                getGitHubMainCommitSha()
+                    .then(function (sha) {
+                        if (sha !== currentVersionSha) {
+                            console.log("New version available: " + sha);
+                            window.location.reload();
+                        }
+                    })
+                    .catch(function () {
+                        console.error("Failed to check for updates.");
+                    });
+            }
 
             /**
              * @param {number} timestamp
@@ -487,9 +526,7 @@
                 };
 
                 confettiContainer.appendChild(confetti);
-
                 confettiCount++;
-                console.log(confettiCount);
             }
 
             function fetchTimeOffset() {
@@ -590,6 +627,19 @@
                 }
             }
 
+            getGitHubMainCommitSha()
+                .then(function (sha) {
+                    currentVersionSha = sha;
+                    console.log("Current version: " + currentVersionSha);
+                    setInterval(function () {
+                        // Check for new updates every 15 minutes
+                        checkForUpdates();
+                    }, 60e3 * 15);
+                })
+                .catch(function () {
+                    console.error("Failed to get latest revision SHA.");
+                    console.warn("Falling back to daily (http-equiv) updates!");
+                });
             fetchTimeOffset()
                 .catch(function () {
                     // Use system time. Can be incorrect!
