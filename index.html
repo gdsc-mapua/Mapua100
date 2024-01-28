@@ -108,6 +108,7 @@
                 text-align: center;
                 background-image: url("images/background.jpg");
                 background-size: cover;
+                background-position: center;
             }
 
             body:not(.clock):not(.countdown) > main {
@@ -225,7 +226,9 @@
                 font-size: calc(var(--font-scale) * 0.75vmin * 1.6);
                 line-height: calc(var(--font-scale) * 0.75vmin);
                 color: #F6F6F6;
+            }
 
+            body.willTransition .colon {
                 transition: opacity 0.5s ease-in-out;
             }
 
