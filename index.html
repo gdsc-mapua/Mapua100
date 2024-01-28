@@ -317,15 +317,12 @@
             var endTimestamp = new Date("2025-01-25T00:00:00+08:00").getTime();
             var transitionTimestamp = new Date("2024-01-25T19:26:00+08:00").getTime();
 
-            var testMode = new URLSearchParams(window.location.search).get("test") === '1';
+            var previewTimeQuery = new URLSearchParams(window.location.search).get("previewTime");
 
             /**
              * @param {number} timestamp
              */
             function offsetTime(timestamp) {
-                if (testMode) {
-                    return timestamp;
-                }
                 return timestamp + timeOffset;
             }
 
@@ -419,6 +416,20 @@
                     timeOffset = 0;
                 })
                 .finally(function () {
+                    if (previewTimeQuery) {
+                        console.log("Received preview time: " + previewTimeQuery);
+                        // Discard the time offset we got from the API and just use the
+                        // provided preview time.
+                        var previewTime = new Date(previewTimeQuery);
+                        if (!isNaN(previewTime.getTime())) {
+                            console.log("Starting clock at " + previewTime.toString());
+                            // Ensure that the time is valid first.
+                            timeOffset = previewTime - Date.now();
+                        } else {
+                            console.error("Preview time invalid. Falling back to system time.");
+                        }
+                    }
+
                     mode = offsetTime(Date.now()) < transitionTimestamp
                         ? "clock"
                         : "countdown";
