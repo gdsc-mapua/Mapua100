@@ -14,12 +14,15 @@
                 --font-scale: 15;
 
                 --background-opacity: 0.6;
-                --hf-opacity: 0.6;
+                --hf-opacity: 0.8;
 
+                --mapua-gold: #CAA452;
                 --mapua-yellow: #FFB81D;
                 --mapua-red: #D94230;
 
                 --date-transition-speed: 3s;
+                --end-transition-speed: 3s;
+                --confetti-lifespan: 5s;
             }
 
             * {
@@ -67,10 +70,15 @@
                 z-index: -10;
             }
 
+            body.end .background-cover {
+                opacity: 0;
+                transition: opacity var(--end-transition-speed) linear;
+            }
+
             header {
                 height: var(--header-height);
                 padding: calc(var(--header-padding) / 2);
-                background-color: rgba(255, 255, 255, var(--hf-opacity));
+                background-color: rgba(246, 246, 246, var(--hf-opacity));
 
                 display: flex;
                 flex-direction: column;
@@ -78,13 +86,29 @@
                 align-items: center;
             }
 
-            header > img {
+            body.end header {
+                background-color: rgba(246, 246, 246, 0.6);
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: 400;
+
+                transition: all var(--end-transition-speed) ease-in-out;
+            }
+
+            header > img.logo-centennial {
                 height: calc(((var(--header-height) - var(--header-padding)) / var(--header-logo-ratio)) * (var(--header-logo-ratio) - 1));
                 padding: 4px;
             }
 
+            header > img.wordmark-mapua {
+                max-height: 0;
+            }
+
             header > div {
-                color: #CAA452;
+                color: var(--mapua-gold);
                 font-family: 'Montserrat', sans-serif;
                 font-weight: bold;
                 text-transform: uppercase;
@@ -93,6 +117,25 @@
                 overflow: hidden;
 
                 transition: all 0.5s ease-in-out;
+            }
+
+            body.end header > img.logo-centennial {
+                height: 35vh;
+                width: auto;
+                max-width: 50vw;
+
+                transition: all var(--end-transition-speed) ease-in-out;
+            }
+
+            body.end header > img.wordmark-mapua {
+                margin-bottom: 5vh;
+                max-height: 10vh;
+                transition: all calc(var(--end-transition-speed) / 2) calc(var(--end-transition-speed) / 2) ease-in-out;
+            }
+
+            body.end header > div {
+                max-height: 0 !important;
+                transition: max-height calc(var(--end-transition-speed) / 2) ease-in-out;
             }
 
             body.clock header > div {
@@ -124,6 +167,11 @@
                 align-content: center;
 
                 transition: opacity 0.5s ease-in-out;
+            }
+
+            body.end > main {
+                opacity: 0;
+                transition: opacity calc(var(--end-transition-speed) / 6) ease-in-out;
             }
 
             .break {
@@ -162,6 +210,14 @@
             body:not(.countdown) .days {
                 opacity: 0;
                 max-height: 0;
+            }
+
+            body.end {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+
+                transition: backdrop-filter var(--end-transition-speed) ease-in-out,
+                    -webkit-backdrop-filter var(--end-transition-speed) ease-in-out;
             }
 
             .days {
@@ -235,7 +291,7 @@
             footer {
                 height: var(--footer-height);
                 text-align: left;
-                background-color: rgba(255, 255, 255, var(--hf-opacity));
+                background-color: rgba(246, 246, 246, var(--hf-opacity));
             }
 
             footer > img {
@@ -252,13 +308,86 @@
                 -webkit-filter: drop-shadow(1vmin 0.4vmin 0.6vmin #222);
                 filter: drop-shadow(1vmin 0.4vmin 0.6vmin #222);
             }
+
+            body.end footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100vw;
+                z-index: 500;
+                background: unset;
+
+                transition: all var(--end-transition-speed) ease-in-out;
+            }
+
+            #headerPlaceholder,
+            #footerPlaceholder {
+                display: none;
+            }
+
+            body.end #headerPlaceholder {
+                display: block;
+                height: var(--header-height);
+            }
+
+            body.end #footerPlaceholder {
+                display: block;
+                height: var(--footer-height);
+            }
+
+            body:not(.end) .confetti {
+                display: none;
+            }
+
+            #confettiContainer {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 100vw;
+                z-index: 800;
+            }
+
+            @keyframes confettiFall {
+                from {
+                    top: calc(-1 * var(--size));
+                    transform: rotate3d(var(--rotX), var(--rotY), var(--rotZ), 0);
+                }
+                to {
+                    top: calc(100vh + var(--size));
+                    transform: rotate3d(var(--rotX), var(--rotY), var(--rotZ), calc(1turn * var(--rots)));
+                }
+            }
+
+            body.end .confetti {
+                display: block;
+                position: fixed;
+                top: calc(-1 * var(--size));
+                left: calc(1vw * var(--x));
+                width: var(--size);
+                height: var(--size);
+
+                background-color: var(--mapua-gold);
+                animation: confettiFall var(--confetti-lifespan) ease-in;
+            }
         </style>
     </head>
     <body>
         <div class="background-cover"></div>
-        <header>
+        <div id="headerPlaceholder"></div>
+        <div id="confettiContainer"></div>
+        <header id="header">
             <div>Road to</div>
-            <img src="images/logo-centennial.png" alt="Mapúa University Centennial Logo">
+            <img
+                class="wordmark-mapua"
+                src="images/wordmark-mapua.png"
+                alt="Mapúa University wordmark"
+            >
+            <img
+                class="logo-centennial"
+                src="images/logo-centennial.png"
+                alt="Mapúa University centennial logo"
+            >
         </header>
         <main>
             <div class="counter days">
@@ -293,6 +422,7 @@
             </div>
         </main>
 
+        <div id="footerPlaceholder"></div>
         <footer>
             <img src="images/logo-gdsc.png" alt="GDSC logo"><!--
             <img src="images/logo-mme.png" alt="MME logo">
@@ -301,6 +431,7 @@
 
         <script>
             var body = document.getElementsByTagName("body")[0];
+            var bodyStyle = getComputedStyle(body);
 
             var timeOffset = 0;
             /** @type {"countdown"|"clock"} */
@@ -312,18 +443,53 @@
             var hourCounter = document.getElementById("hours");
             var minuteCounter = document.getElementById("minutes");
             var secondCounter = document.getElementById("seconds");
+            var confettiContainer = document.getElementById("confettiContainer");
 
             var updateHz = 24;
             var endTimestamp = new Date("2025-01-25T00:00:00+08:00").getTime();
+            var endDuration = bodyStyle.getPropertyValue("--end-transition-speed").match(/\d+/)[0] * 1e3;
             var transitionTimestamp = new Date("2024-01-25T19:26:00+08:00").getTime();
+            var transitionDuration = bodyStyle.getPropertyValue("--date-transition-speed").match(/\d+/)[0] * 1e3;
+            var confettiLifespan = bodyStyle.getPropertyValue("--confetti-lifespan").match(/\d+/)[0] * 1e3;
 
             var previewTimeQuery = new URLSearchParams(window.location.search).get("previewTime");
+
+            var confettiPopped = false;
+            var confettiCount = 0;
+            var confettiMax = 100;
 
             /**
              * @param {number} timestamp
              */
             function offsetTime(timestamp) {
                 return timestamp + timeOffset;
+            }
+
+            function spawnConfetti(starter) {
+                if (confettiCount > confettiMax && !starter) {
+                    return;
+                }
+
+                var confetti = document.createElement("div");
+
+                confetti.classList.add("confetti");
+                confetti.style.setProperty("--size", `${Math.random() * 1.4 + 0.6}vw`);
+                confetti.style.setProperty("--x", `${Math.random() * 100}`);
+                confetti.style.setProperty("--rots", `${Math.random() * 4 + 2}`);
+                confetti.style.setProperty("--rotX", `${Math.random() * 360}`);
+                confetti.style.setProperty("--rotY", `${Math.random() * 360}`);
+                confetti.style.setProperty("--rotZ", `${Math.random() * 360}`);
+
+                confetti.onanimationend = function () {
+                    confettiContainer.removeChild(confetti);
+                    confettiCount--;
+                    setTimeout(spawnConfetti.bind(null, false), Math.random() * confettiLifespan);
+                };
+
+                confettiContainer.appendChild(confetti);
+
+                confettiCount++;
+                console.log(confettiCount);
             }
 
             function fetchTimeOffset() {
@@ -393,19 +559,33 @@
                     body.classList.toggle("clock", true);
                     body.classList.toggle("countdown", false);
                     updateClock();
-                } else {
+                } else if (currentTimestamp < endTimestamp) {
                     body.classList.toggle("clock", false);
                     body.classList.toggle("countdown", true);
-                    if (currentTimestamp < transitionTimestamp + 3e3) {
+                    if (currentTimestamp < transitionTimestamp + transitionDuration) {
                         // 3 seconds after transition time
                         var fakeTime = new Date(currentTimestamp);
                         fakeTime.setHours(0, 0, 1);
                         var fakeAddDelta = fakeTime.getTime() - currentTimestamp;
-                        var progress = -Math.log((currentTimestamp - transitionTimestamp) / 3e3) / Math.E;
+                        var progress = -Math.log((currentTimestamp - transitionTimestamp) / transitionDuration) / Math.E;
                         var fakeDelta = delta - (fakeAddDelta * progress);
                         updateCountdown(fakeDelta);
                     } else {
                         updateCountdown(delta);
+                    }
+                } else {
+                    body.classList.add("end");
+
+                    if (!confettiPopped) {
+                        confettiPopped = true;
+                        setTimeout(function () {
+                            for (var i = 0; i < confettiMax * 2; i++) {
+                                setTimeout(
+                                    spawnConfetti.bind(null, true),
+                                    confettiLifespan * (i / confettiMax * 2)
+                                );
+                            }
+                        }, endDuration);
                     }
                 }
             }
