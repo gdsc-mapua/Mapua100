@@ -435,6 +435,7 @@
 
             var currentVersionSha;
             var timeOffset = 0;
+            var lastKnownTime = Date.now();
             /** @type {"countdown"|"clock"} */
             var mode;
 
@@ -627,6 +628,36 @@
                 }
             }
 
+            function adjustClock() {
+                fetchTimeOffset()
+                    .catch(function () {
+                        // Use system time. Can be incorrect!
+                        timeOffset = 0;
+                    })
+                    .finally(function () {
+                        if (previewTimeQuery) {
+                            console.log("Received preview time: " + previewTimeQuery);
+                            // Discard the time offset we got from the API and just use the
+                            // provided preview time.
+                            var previewTime = new Date(previewTimeQuery);
+                            if (!isNaN(previewTime.getTime())) {
+                                console.log("Starting clock at " + previewTime.toString());
+                                // Ensure that the time is valid first.
+                                timeOffset = previewTime - Date.now();
+                            } else {
+                                console.error("Preview time invalid. Falling back to system time.");
+                            }
+                        }
+
+                        mode = offsetTime(Date.now()) < transitionTimestamp
+                            ? "clock"
+                            : "countdown";
+                        body.classList.toggle("willTransition", mode === "clock");
+                        updateTime();
+                        setInterval(updateTime, 1000 / updateHz);
+                    });
+            }
+
             getGitHubMainCommitSha()
                 .then(function (sha) {
                     currentVersionSha = sha;
@@ -640,33 +671,30 @@
                     console.error("Failed to get latest revision SHA.");
                     console.warn("Falling back to daily (http-equiv) updates!");
                 });
-            fetchTimeOffset()
-                .catch(function () {
-                    // Use system time. Can be incorrect!
-                    timeOffset = 0;
-                })
-                .finally(function () {
-                    if (previewTimeQuery) {
-                        console.log("Received preview time: " + previewTimeQuery);
-                        // Discard the time offset we got from the API and just use the
-                        // provided preview time.
-                        var previewTime = new Date(previewTimeQuery);
-                        if (!isNaN(previewTime.getTime())) {
-                            console.log("Starting clock at " + previewTime.toString());
-                            // Ensure that the time is valid first.
-                            timeOffset = previewTime - Date.now();
-                        } else {
-                            console.error("Preview time invalid. Falling back to system time.");
-                        }
+            adjustClock();
+            setInterval(function () {
+                // Re-adjust clock every one hour
+                adjustClock();
+            }, 60e3 * 60);
+
+            setTimeout(function () {
+                var timeNow = Date.now();
+
+                if (Math.abs(timeNow - lastKnownTime) > 15e3) {
+                    // The clock moved forward or backward more than 15 seconds.
+                    // Usually this means the local time changed. We'll need to
+                    // do the offset fix again.
+
+                    // If the delay isn't significant, set the delay back to zero.
+                    if (Math.abs(timeOffset) < 15e3) {
+                        timeOffset = 0;
                     }
 
-                    mode = offsetTime(Date.now()) < transitionTimestamp
-                        ? "clock"
-                        : "countdown";
-                    body.classList.toggle("willTransition", mode === "clock");
-                    updateTime();
-                    setInterval(updateTime, 1000 / updateHz);
-                });
+                    adjustClock();
+                }
+
+                lastKnownTime = Date.now();
+            }, 1000);
         </script>
     </body>
 </html>
