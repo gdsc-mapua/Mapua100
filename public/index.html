@@ -377,8 +377,12 @@
                     lastKnownTime = Date.now();
                 }, 1000);
             } catch (e) {
-                document.getElementsByTagName("main")[0].innerText = "Failed to load: " + e;
-                alert("Failed to start: " + e);
+                document.getElementsByTagName("main")[0].innerText = 
+                    "Failed to load: " + e;
+                const pre = document.createElement("pre");
+                pre.innerText = e.stack;
+                document.getElementsByTagName("main")[0].appendChild(pre);
+                alert("Failed to start: " + e + "\n" + err.stack);
             }
         </script>
     </body>
