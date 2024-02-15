@@ -377,7 +377,7 @@
                     lastKnownTime = Date.now();
                 }, 1000);
             } catch (e) {
-                alert("Failed to start: " + e + "\n" + err.stack);
+                alert("Failed to start: " + e + "\n" + e.stack);
                 document.getElementsByTagName("main")[0].innerText = 
                     "Failed to load: " + e;
                 const pre = document.createElement("pre");
