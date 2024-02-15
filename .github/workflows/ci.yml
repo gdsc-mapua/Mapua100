@@ -1,0 +1,55 @@
+name: Deploy static content to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps: 
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Copy public to build
+          run: cp -r public build
+        - name: Compile SCSS files
+          run: |
+            /usr/bin/find src/ -name '*.scss' | while read -r file
+            do
+                OUT_PATH=${file#"src/"}
+                npx -y sass "$file":"build/${OUT_PATH%".scss"}.css"
+            done
+        - name: Upload static build
+          uses: actions/upload-artifact@v4
+          with:
+            name: static
+            path: build
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+    
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: 'build'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

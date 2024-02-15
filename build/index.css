@@ -1,0 +1,323 @@
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@font-face {
+  font-family: "Outfit";
+  font-weight: bold;
+  src: url("fonts/Outfit-Bold.ttf");
+}
+@font-face {
+  font-family: "Outfit";
+  font-weight: normal;
+  src: url("fonts/Outfit-Regular.ttf");
+}
+@font-face {
+  font-family: "Montserrat";
+  font-weight: bold;
+  src: url("fonts/Montserrat-Bold.ttf");
+}
+@font-face {
+  font-family: "Oswald";
+  font-weight: bold;
+  src: url("fonts/Oswald-Bold.ttf");
+}
+html, body {
+  margin: 0;
+  overflow: hidden;
+}
+
+.background-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: -10;
+}
+
+body.end .background-cover {
+  opacity: 0;
+  transition: opacity 3s linear;
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -15;
+  background-image: url("images/background.jpg");
+  background-size: cover;
+  background-position: center;
+  transition: filter 3s ease-in-out;
+}
+
+body.end .background {
+  filter: blur(10px);
+}
+
+header {
+  height: 18vh;
+  padding: 0.5vh;
+  background-color: rgba(246, 246, 246, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+body.end header {
+  background-color: rgba(246, 246, 246, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 400;
+  transition: all 3s ease-in-out;
+}
+
+header > img.logo-centennial {
+  height: 13.6vh;
+  padding: 4px;
+}
+
+header > img.wordmark-mapua {
+  max-height: 0;
+}
+
+header > div {
+  color: #CAA452;
+  font-family: "Montserrat", sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 3.4vh;
+  line-height: 1em;
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+}
+
+body.end header > img.logo-centennial {
+  height: 35vh;
+  width: auto;
+  max-width: 50vw;
+  transition: all 3s ease-in-out;
+}
+
+body.end header > img.wordmark-mapua {
+  margin-bottom: 5vh;
+  max-height: 10vh;
+  transition: all 1.5s 1.5s ease-in-out;
+}
+
+body.end header > div {
+  max-height: 0 !important;
+  transition: max-height 1.5s ease-in-out;
+}
+
+body.clock header > div {
+  max-height: 0;
+}
+
+body.countdown header > div {
+  max-height: 1em;
+}
+
+body {
+  font-family: "Outfit", "Helvetica", sans-serif;
+  text-align: center;
+}
+
+body:not(.clock):not(.countdown) > main {
+  opacity: 0;
+}
+
+main {
+  height: 75vh;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+  transition: opacity 0.5s ease-in-out;
+}
+
+body.end > main {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.break {
+  flex-basis: 100%;
+  height: 6vmin;
+}
+
+.counter {
+  font-size: 11.25vmin;
+  max-width: 22.5vw;
+  width: 100%;
+}
+
+.date, .days {
+  max-width: 100% !important;
+}
+
+body.willTransition .days {
+  transition: opacity 1s 2s ease-in-out, max-height 1s 2s ease-in-out;
+}
+
+body.willTransition .date {
+  font-size: 9vmin;
+  transition: opacity 1s ease-in-out, max-height 1s ease-in-out;
+}
+
+body:not(.countdown) .date,
+body.countdown .days {
+  opacity: 1;
+  max-height: 100%;
+}
+
+body.countdown .date,
+body:not(.countdown) .days {
+  opacity: 0;
+  max-height: 0;
+}
+
+.days {
+  font-size: 15vmin;
+  max-width: 45vw;
+}
+
+.counter > .number {
+  text-shadow: 0 1vmin 0.7vmin rgba(42, 42, 42, 0.95);
+  color: #FFB81D;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 0.8em;
+}
+
+/* number */
+.days > .number,
+.date > .number {
+  font-size: 2.4em;
+  color: #D94230;
+  text-transform: uppercase;
+}
+
+.date > .label {
+  margin-bottom: 2vh;
+}
+
+#dayOfWeek {
+  font-size: 1em;
+}
+
+#clockDate {
+  font-size: 1.4em;
+}
+
+/* labels */
+.counter > .label {
+  color: white;
+  display: block;
+  font-size: 0.4em;
+  line-height: 1em;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out;
+}
+
+body.countdown .counter:not(.date) > .label {
+  max-height: 1em;
+}
+
+body.clock .counter:not(.date) > .label {
+  max-height: 0;
+}
+
+body.countdown .colon {
+  opacity: 0;
+}
+
+.colon {
+  font-family: "Oswald", "Outfit", "Helvetica", sans-serif;
+  font-size: 18vmin;
+  line-height: 11.25vmin;
+  color: #F6F6F6;
+}
+
+body.willTransition .colon {
+  transition: opacity 0.5s ease-in-out;
+}
+
+footer {
+  height: 7vh;
+  text-align: left;
+  background-color: rgba(246, 246, 246, 0.8);
+}
+
+footer > img {
+  padding: 0.5vmin 0 0.5vmin 0.5vmin;
+  width: auto;
+  height: 7vh;
+}
+
+footer > img:not(.eece) {
+  border-radius: 1vmin;
+}
+
+footer > img.eece {
+  -webkit-filter: drop-shadow(1vmin 0.4vmin 0.6vmin #222);
+  filter: drop-shadow(1vmin 0.4vmin 0.6vmin #222);
+}
+
+body.end footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 500;
+  background: unset;
+  transition: all 3s ease-in-out;
+}
+
+#headerPlaceholder,
+#footerPlaceholder {
+  display: none;
+}
+
+body.end #headerPlaceholder {
+  display: block;
+  height: 18vh;
+}
+
+body.end #footerPlaceholder {
+  display: block;
+  height: 7vh;
+}
+
+body:not(.end) .confetti {
+  display: none;
+}
+
+#confettiContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 800;
+}
+
+body.end .confetti {
+  display: block;
+  position: fixed;
+  background-color: #CAA452;
+}
+
+/*# sourceMappingURL=index.css.map */

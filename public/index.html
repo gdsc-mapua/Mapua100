@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="refresh" content="86400">
+
+        <title>Mapúa University &ndash; Road to 100</title>
+        <link rel="stylesheet" type="text/css" href="index.css">
+    </head>
+    <body>
+        <div class="background"></div>
+        <div class="background-cover"></div>
+        <div id="headerPlaceholder"></div>
+        <div id="confettiContainer"></div>
+        <header id="header">
+            <div>Road to</div>
+            <img
+                class="wordmark-mapua"
+                src="images/wordmark-mapua.png"
+                alt="Mapúa University wordmark"
+            >
+            <img
+                class="logo-centennial"
+                src="images/logo-centennial.png"
+                alt="Mapúa University centennial logo"
+            >
+        </header>
+        <main>
+            <div class="counter days">
+                <span class="number" id="days">???</span>
+                <span class="label">days to go</span>
+            </div>
+            <div class="counter date">
+                <span class="label">Today is</span>
+                <span class="number" id="clockDate">???</span><br/>
+                <span class="number" id="dayOfWeek">???</span>
+            </div>
+
+            <div class="break"></div>
+
+            <div class="counter">
+                <span class="number" id="hours">??</span>
+                <span class="label">hours</span>
+            </div>
+
+            <div class="colon">:</div>
+
+            <div class="counter">
+                <span class="number" id="minutes">??</span>
+                <span class="label">minutes</span>
+            </div>
+
+            <div class="colon">:</div>
+
+            <div class="counter">
+                <span class="number" id="seconds">??</span>
+                <span class="label">seconds</span>
+            </div>
+        </main>
+
+        <div id="footerPlaceholder"></div>
+        <footer>
+            <img src="images/logo-gdsc.png" alt="GDSC logo"><!--
+            <img src="images/logo-mme.png" alt="MME logo">
+            --><img class="eece" src="images/logo-eece.png" alt="EECE logo">
+        </footer>
+
+        <script>
+            var fromCss = {
+                endTransitionSpeed: 3,
+                dateTransitionSpeed: 3,
+                confettiLifespan: 5
+            };
+
+            var body = document.getElementsByTagName("body")[0];
+            var bodyStyle = getComputedStyle(body);
+
+            var currentVersionSha;
+            var delta;
+            var timeOffset = 0;
+            var lastKnownTime = Date.now();
+            /** @type {"countdown"|"clock"} */
+            var mode;
+
+            var dayOfWeek = document.getElementById("dayOfWeek");
+            var clockDate = document.getElementById("clockDate");
+            var dayCounter = document.getElementById("days");
+            var hourCounter = document.getElementById("hours");
+            var minuteCounter = document.getElementById("minutes");
+            var secondCounter = document.getElementById("seconds");
+            var confettiContainer = document.getElementById("confettiContainer");
+
+            var updateHz = 24;
+            var endTimestamp = new Date("2025-01-25T00:00:00+08:00").getTime();
+            var transitionTimestamp = new Date("2024-01-25T19:26:00+08:00").getTime();
+            var endDuration = fromCss.endDuration * 1000;
+            var transitionDuration = fromCss.transitionDuration * 1000;
+            var confettiLifespan = fromCss.confettiLifespan * 1000;
+
+            var previewTimeQuery = /[?&]previewTime=([^&]+)(?:&|$)/.exec(window.location.search);
+
+            if (previewTimeQuery) {
+                previewTimeQuery = previewTimeQuery[1];
+            }
+
+            var confettiPopped = false;
+            var confettiCount = 0;
+            var confettiMax = 100;
+
+            function getGitHubMainCommitSha() {
+                return new Promise(function (res, rej) {
+                    // Using an XHR here, *just in case* the TV does not support the
+                    // Fetch API. `fetch` would be much better.
+                    var request = new XMLHttpRequest();
+                    request.open("GET", "https://api.github.com/repos/gdsc-mapua/Mapua100/git/refs", true);
+
+                    request.onload = function() {
+                        if (this.status >= 200 && this.status < 400) {
+                            var data = JSON.parse(this.response);
+                            res(data[0]["object"]["sha"]);
+                        } else {
+                            console.error("Failed to get latest version from GitHub.");
+                            rej();
+                        }
+                    };
+
+                    request.send();
+                });
+            }
+
+            function checkForUpdates() {
+                if (!currentVersionSha) {
+                    // No SHA to base off of.
+                    return;
+                }
+                getGitHubMainCommitSha()
+                    .then(function (sha) {
+                        if (sha !== currentVersionSha) {
+                            console.log("New version available: " + sha);
+                            window.location.reload();
+                        }
+                    })
+                    .catch(function () {
+                        console.error("Failed to check for updates.");
+                    });
+            }
+
+            /**
+             * @param {number} timestamp
+             */
+            function offsetTime(timestamp) {
+                return timestamp + timeOffset;
+            }
+
+            function spawnConfetti(starter) {
+                if (confettiCount > confettiMax && !starter) {
+                    return;
+                }
+
+                var confetti = document.createElement("div");
+
+                var size = Math.random() * 1.4 + 0.6;
+                var rotX = Math.random();
+                var rotY = Math.random();
+                var rotZ = Math.random();
+                var rots = (Math.random() * 2 + 4) * 360;
+                confetti.classList.add("confetti");
+                confetti.style.left = Math.random() * 100 + "vw";
+                confetti.style.width = size + "vw";
+                confetti.style.height = size + "vw";
+                confetti.style.top = -size + "vw";
+
+                confetti.animate([
+                    {
+                        top: -size + "vw",
+                        transform: "rotate3d(" + rotX + ", " + rotY + ", " + rotZ + ", 0)"
+                    },
+                    {
+                        top: "calc(100vh + " + size + "vw)",
+                        transform: "rotate3d(" + rotX + ", " + rotY + ", " + rotZ + ", " + rots + "deg)"
+                    }
+                ], {
+                    duration: fromCss.confettiLifespan * 1000,
+                    easing: "ease-in"
+                });
+
+                // var transitionInterval = setInterval(function () {
+                //     confetti.setAttribute("top", String(size * -1));
+                // }, 1000 / 60);
+
+                setTimeout(function () {
+                    confettiContainer.removeChild(confetti);
+                    confettiCount--;
+                    setTimeout(spawnConfetti.bind(null, false), Math.random() * confettiLifespan);
+                }, fromCss.confettiLifespan * 1000);
+
+                confettiContainer.appendChild(confetti);
+                confettiCount++;
+            }
+
+            function fetchTimeOffset() {
+                return new Promise(function (res, rej) {
+                    // Using an XHR here, *just in case* the TV does not support the
+                    // Fetch API. `fetch` would be much better.
+                    var request = new XMLHttpRequest();
+                    request.open("GET", "https://worldtimeapi.org/api/timezone/Asia/Manila", true);
+
+                    // Account for response time delay
+                    var loadStartTime;
+                    request.onreadystatechange = function () {
+                        if (request.readyState === XMLHttpRequest.HEADERS_RECEIVED) {
+                            loadStartTime = Date.now();
+                        }
+                    };
+                    request.onload = function() {
+                        if (this.status >= 200 && this.status < 400) {
+                            var data = JSON.parse(this.response);
+                            var now = Date.now();
+                            timeOffset = new Date(data["utc_datetime"]) - now + (now - loadStartTime);
+                            console.log("Calculated delay: " + timeOffset + "ms");
+                            console.log("Request latency: " + (now - loadStartTime) + "ms");
+                            res();
+                        }
+                        rej();
+                    };
+
+                    request.send();
+                    setTimeout(rej, 10000);
+                });
+            }
+
+            function updateClock() {
+                var currentDate = new Date(offsetTime(Date.now()));
+
+                var hours = currentDate.getHours();
+                var minutes = currentDate.getMinutes();
+                var seconds = currentDate.getSeconds();
+
+                dayOfWeek.innerText = currentDate.toLocaleDateString("en-PH", { weekday: "long" });
+                clockDate.innerText = currentDate.toLocaleDateString("en-PH", { dateStyle: "long" });
+                hourCounter.innerText = hours < 10 ? "0" + hours : hours;
+                minuteCounter.innerText = minutes < 10 ? "0" + minutes : minutes;
+                secondCounter.innerText = seconds < 10 ? "0" + seconds : seconds;
+            }
+
+            function updateCountdown(delta) {
+                body.classList.toggle("countdown", true);
+                var days = Math.floor(delta / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((delta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((delta % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((delta % (1000 * 60)) / 1000);
+
+                dayCounter.innerText = days < 10 ? "0" + days : days;
+                hourCounter.innerText = hours < 10 ? "0" + hours : hours;
+                minuteCounter.innerText = minutes < 10 ? "0" + minutes : minutes;
+                secondCounter.innerText = seconds < 10 ? "0" + seconds : seconds;
+            }
+
+            function updateTime() {
+                var currentTimestamp = offsetTime(Date.now());
+                delta = endTimestamp - currentTimestamp;
+
+                // Check if the specified condition is met
+                if (currentTimestamp < transitionTimestamp) {
+                    body.classList.toggle("clock", true);
+                    body.classList.toggle("countdown", false);
+                    updateClock();
+                } else if (currentTimestamp < endTimestamp) {
+                    body.classList.toggle("clock", false);
+                    body.classList.toggle("countdown", true);
+                    if (currentTimestamp < transitionTimestamp + transitionDuration) {
+                        // 3 seconds after transition time
+                        var fakeTime = new Date(currentTimestamp);
+                        fakeTime.setHours(0, 0, 1);
+                        var fakeAddDelta = fakeTime.getTime() - currentTimestamp;
+                        var progress = -Math.log((currentTimestamp - transitionTimestamp) / transitionDuration) / Math.E;
+                        var fakeDelta = delta - (fakeAddDelta * progress);
+                        updateCountdown(fakeDelta);
+                    } else {
+                        updateCountdown(delta);
+                    }
+                } else {
+                    body.classList.add("end");
+
+                    if (!confettiPopped) {
+                        confettiPopped = true;
+                        setTimeout(function () {
+                            for (var i = 0; i < confettiMax * 2; i++) {
+                                setTimeout(
+                                    spawnConfetti.bind(null, true),
+                                    confettiLifespan * (i / confettiMax * 2)
+                                );
+                            }
+                        }, endDuration);
+                    }
+                }
+            }
+
+            /**
+             * Adjust the clock to use actual time instead of system time.
+             * 
+             * @param {start} [string] Whether this is the start of execution.
+             *   If not, this function will not run if it is within 15 minutes
+             *   of endTimestamp.
+             */
+            function adjustClock(start) {
+                if (delta != null && delta < 60000 * 15) {
+                    return;
+                }
+
+                console.log("Updating clock...");
+                fetchTimeOffset()
+                    .catch(function () {
+                        // Use system time. Can be incorrect!
+                        timeOffset = 0;
+                    })
+                    .finally(function () {
+                        if (previewTimeQuery) {
+                            console.log("Received preview time: " + previewTimeQuery);
+                            // Discard the time offset we got from the API and just use the
+                            // provided preview time.
+                            var previewTime = new Date(previewTimeQuery);
+                            if (!isNaN(previewTime.getTime())) {
+                                console.log("Starting clock at " + previewTime.toString());
+                                // Ensure that the time is valid first.
+                                timeOffset = previewTime - Date.now();
+                            } else {
+                                console.error("Preview time invalid. Falling back to system time.");
+                            }
+                        }
+
+                        mode = offsetTime(Date.now()) < transitionTimestamp
+                            ? "clock"
+                            : "countdown";
+                        body.classList.toggle("willTransition", mode === "clock");
+                        updateTime();
+                        setInterval(updateTime, 1000 / updateHz);
+                    });
+            }
+
+            getGitHubMainCommitSha()
+                .then(function (sha) {
+                    currentVersionSha = sha;
+                    console.log("Current version: " + currentVersionSha);
+                    setInterval(function () {
+                        // Check for new updates every 15 minutes
+                        checkForUpdates();
+                    }, 60000 * 15);
+                })
+                .catch(function () {
+                    console.error("Failed to get latest revision SHA.");
+                    console.warn("Falling back to daily (http-equiv) updates!");
+                });
+            adjustClock(true);
+            setInterval(function () {
+                // Re-adjust clock every one hour
+                adjustClock();
+            }, 60000 * 60);
+
+            setTimeout(function () {
+                var timeNow = Date.now();
+
+                if (Math.abs(timeNow - lastKnownTime) > 15000) {
+                    // The clock moved forward or backward more than 15 seconds.
+                    // Usually this means the local time changed. We'll need to
+                    // do the offset fix again.
+
+                    // If the delay isn't significant, set the delay back to zero.
+                    if (Math.abs(timeOffset) < 15000) {
+                        timeOffset = 0;
+                    }
+
+                    adjustClock();
+                }
+
+                lastKnownTime = Date.now();
+            }, 1000);
+        </script>
+    </body>
+</html>

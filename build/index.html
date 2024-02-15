@@ -5,374 +5,10 @@
         <meta http-equiv="refresh" content="86400">
 
         <title>Mapúa University &ndash; Road to 100</title>
-        <style>
-            :root {
-                --header-height: 18vh;
-                --header-padding: 1vh;
-                --header-logo-ratio: 5;
-                --footer-height: 7vh;
-                --font-scale: 15;
-
-                --background-opacity: 0.6;
-                --hf-opacity: 0.8;
-
-                --mapua-gold: #CAA452;
-                --mapua-yellow: #FFB81D;
-                --mapua-red: #D94230;
-
-                --date-transition-speed: 3s;
-                --end-transition-speed: 3s;
-                --confetti-lifespan: 5s;
-            }
-
-            * {
-                box-sizing: border-box;
-                user-select: none;
-                -webkit-user-select: none;
-            }
-
-            @font-face {
-                font-family: 'Outfit';
-                font-weight: bold;
-                src: url('fonts/Outfit-Bold.ttf');
-            }
-
-            @font-face {
-                font-family: 'Outfit';
-                font-weight: normal;
-                src: url('fonts/Outfit-Regular.ttf');
-            }
-
-            @font-face {
-                font-family: 'Montserrat';
-                font-weight: bold;
-                src: url('fonts/Montserrat-Bold.ttf');
-            }
-
-            @font-face {
-                font-family: 'Oswald';
-                font-weight: bold;
-                src: url('fonts/Oswald-Bold.ttf');
-            }
-
-            html, body {
-                margin: 0;
-                overflow: hidden;
-            }
-
-            .background-cover {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background-color: rgba(0, 0, 0, var(--background-opacity));
-                z-index: -10;
-            }
-
-            body.end .background-cover {
-                opacity: 0;
-                transition: opacity var(--end-transition-speed) linear;
-            }
-
-            header {
-                height: var(--header-height);
-                padding: calc(var(--header-padding) / 2);
-                background-color: rgba(246, 246, 246, var(--hf-opacity));
-
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-
-            body.end header {
-                background-color: rgba(246, 246, 246, 0.6);
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                z-index: 400;
-
-                transition: all var(--end-transition-speed) ease-in-out;
-            }
-
-            header > img.logo-centennial {
-                height: calc(((var(--header-height) - var(--header-padding)) / var(--header-logo-ratio)) * (var(--header-logo-ratio) - 1));
-                padding: 4px;
-            }
-
-            header > img.wordmark-mapua {
-                max-height: 0;
-            }
-
-            header > div {
-                color: var(--mapua-gold);
-                font-family: 'Montserrat', sans-serif;
-                font-weight: bold;
-                text-transform: uppercase;
-                font-size: calc((var(--header-height) - var(--header-padding)) / var(--header-logo-ratio));
-                line-height: 1em;
-                overflow: hidden;
-
-                transition: all 0.5s ease-in-out;
-            }
-
-            body.end header > img.logo-centennial {
-                height: 35vh;
-                width: auto;
-                max-width: 50vw;
-
-                transition: all var(--end-transition-speed) ease-in-out;
-            }
-
-            body.end header > img.wordmark-mapua {
-                margin-bottom: 5vh;
-                max-height: 10vh;
-                transition: all calc(var(--end-transition-speed) / 2) calc(var(--end-transition-speed) / 2) ease-in-out;
-            }
-
-            body.end header > div {
-                max-height: 0 !important;
-                transition: max-height calc(var(--end-transition-speed) / 2) ease-in-out;
-            }
-
-            body.clock header > div {
-                max-height: 0;
-            }
-
-            body.countdown header > div {
-                max-height: 1em;
-            }
-
-            body {
-                font-family: 'Outfit', 'Helvetica', sans-serif;
-                text-align: center;
-                background-image: url("images/background.jpg");
-                background-size: cover;
-                background-position: center;
-            }
-
-            body:not(.clock):not(.countdown) > main {
-                opacity: 0;
-            }
-
-            main {
-                height: calc(100vh - var(--header-height) - var(--footer-height));
-                display: flex;
-                flex-wrap: wrap;
-                flex-direction: row;
-                justify-content: center;
-                align-content: center;
-
-                transition: opacity 0.5s ease-in-out;
-            }
-
-            body.end > main {
-                opacity: 0;
-                transition: opacity calc(var(--end-transition-speed) / 6) ease-in-out;
-            }
-
-            .break {
-                flex-basis: 100%;
-                height: calc(var(--font-scale) * 0.4vmin);
-            }
-
-            .counter {
-                font-size: calc(var(--font-scale) * 0.75vmin);
-                max-width: calc(var(--font-scale) * 1.5vw);
-                width: 100%;
-            }
-
-            .date, .days {
-                max-width: 100% !important;
-            }
-
-            body.willTransition .days {
-                transition: opacity calc(var(--date-transition-speed) / 3) calc(var(--date-transition-speed) / 3 * 2) ease-in-out,
-                            max-height calc(var(--date-transition-speed) / 3) calc(var(--date-transition-speed) / 3 * 2) ease-in-out;
-            }
-
-            body.willTransition .date {
-                font-size: calc(var(--font-scale) * 0.6vmin);
-                transition: opacity calc(var(--date-transition-speed) / 3) ease-in-out,
-                            max-height calc(var(--date-transition-speed) / 3) ease-in-out;
-            }
-
-            body:not(.countdown) .date,
-            body.countdown .days {
-                opacity: 1;
-                max-height: 100%;
-            }
-
-            body.countdown .date,
-            body:not(.countdown) .days {
-                opacity: 0;
-                max-height: 0;
-            }
-
-            body.end {
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-
-                transition: backdrop-filter var(--end-transition-speed) ease-in-out,
-                    -webkit-backdrop-filter var(--end-transition-speed) ease-in-out;
-            }
-
-            .days {
-                font-size: calc(var(--font-scale) * 1vmin);
-                max-width: calc(var(--font-scale) * 3vw);
-            }
-
-            .counter > .number {
-                text-shadow: 0 1vmin 0.7vmin rgba(42, 42, 42, 0.95);
-                color: var(--mapua-yellow);
-                font-size: 1.5em;
-                font-weight: bold;
-                line-height: 0.8em;
-            }
-
-            /* number */
-            .days > .number,
-            .date > .number {
-                font-size: 2.4em;
-                color: var(--mapua-red);
-                text-transform: uppercase;
-            }
-
-            .date > .label {
-                margin-bottom: 2vh;
-            }
-
-            #dayOfWeek {
-                font-size: 1em;
-            }
-
-            #clockDate {
-                font-size: 1.4em;
-            }
-
-            /* labels */
-            .counter > .label {
-                color: white;
-                display: block;
-                font-size: 0.4em;
-                line-height: 1em;
-                text-transform: uppercase;
-                overflow: hidden;
-
-                transition: max-height 0.5s ease-in-out;
-            }
-
-            body.countdown .counter:not(.date) > .label {
-                max-height: 1em;
-            }
-
-            body.clock .counter:not(.date) > .label {
-                max-height: 0;
-            }
-
-            body.countdown .colon {
-                opacity: 0;
-            }
-
-            .colon {
-                font-family: 'Oswald', 'Outfit', 'Helvetica', sans-serif;
-                font-size: calc(var(--font-scale) * 0.75vmin * 1.6);
-                line-height: calc(var(--font-scale) * 0.75vmin);
-                color: #F6F6F6;
-            }
-
-            body.willTransition .colon {
-                transition: opacity 0.5s ease-in-out;
-            }
-
-            footer {
-                height: var(--footer-height);
-                text-align: left;
-                background-color: rgba(246, 246, 246, var(--hf-opacity));
-            }
-
-            footer > img {
-                padding: 0.5vmin 0 0.5vmin 0.5vmin;
-                width: auto;
-                height: var(--footer-height);
-            }
-
-            footer > img:not(.eece) {
-                border-radius: 1vmin;
-            }
-
-            footer > img.eece {
-                -webkit-filter: drop-shadow(1vmin 0.4vmin 0.6vmin #222);
-                filter: drop-shadow(1vmin 0.4vmin 0.6vmin #222);
-            }
-
-            body.end footer {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100vw;
-                z-index: 500;
-                background: unset;
-
-                transition: all var(--end-transition-speed) ease-in-out;
-            }
-
-            #headerPlaceholder,
-            #footerPlaceholder {
-                display: none;
-            }
-
-            body.end #headerPlaceholder {
-                display: block;
-                height: var(--header-height);
-            }
-
-            body.end #footerPlaceholder {
-                display: block;
-                height: var(--footer-height);
-            }
-
-            body:not(.end) .confetti {
-                display: none;
-            }
-
-            #confettiContainer {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100vh;
-                width: 100vw;
-                z-index: 800;
-            }
-
-            @keyframes confettiFall {
-                from {
-                    top: calc(-1 * var(--size));
-                    transform: rotate3d(var(--rotX), var(--rotY), var(--rotZ), 0);
-                }
-                to {
-                    top: calc(100vh + var(--size));
-                    transform: rotate3d(var(--rotX), var(--rotY), var(--rotZ), calc(1turn * var(--rots)));
-                }
-            }
-
-            body.end .confetti {
-                display: block;
-                position: fixed;
-                top: calc(-1 * var(--size));
-                left: calc(1vw * var(--x));
-                width: var(--size);
-                height: var(--size);
-
-                background-color: var(--mapua-gold);
-                animation: confettiFall var(--confetti-lifespan) ease-in;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="index.css">
     </head>
     <body>
+        <div class="background"></div>
         <div class="background-cover"></div>
         <div id="headerPlaceholder"></div>
         <div id="confettiContainer"></div>
@@ -430,6 +66,12 @@
         </footer>
 
         <script>
+            var fromCss = {
+                endTransitionSpeed: 3,
+                dateTransitionSpeed: 3,
+                confettiLifespan: 5
+            };
+
             var body = document.getElementsByTagName("body")[0];
             var bodyStyle = getComputedStyle(body);
 
@@ -450,12 +92,16 @@
 
             var updateHz = 24;
             var endTimestamp = new Date("2025-01-25T00:00:00+08:00").getTime();
-            var endDuration = bodyStyle.getPropertyValue("--end-transition-speed").match(/\d+/)[0] * 1e3;
             var transitionTimestamp = new Date("2024-01-25T19:26:00+08:00").getTime();
-            var transitionDuration = bodyStyle.getPropertyValue("--date-transition-speed").match(/\d+/)[0] * 1e3;
-            var confettiLifespan = bodyStyle.getPropertyValue("--confetti-lifespan").match(/\d+/)[0] * 1e3;
+            var endDuration = fromCss.endDuration * 1000;
+            var transitionDuration = fromCss.transitionDuration * 1000;
+            var confettiLifespan = fromCss.confettiLifespan * 1000;
 
-            var previewTimeQuery = new URLSearchParams(window.location.search).get("previewTime");
+            var previewTimeQuery = /[?&]previewTime=([^&]+)(?:&|$)/.exec(window.location.search);
+
+            if (previewTimeQuery) {
+                previewTimeQuery = previewTimeQuery[1];
+            }
 
             var confettiPopped = false;
             var confettiCount = 0;
@@ -513,19 +159,40 @@
 
                 var confetti = document.createElement("div");
 
+                var size = Math.random() * 1.4 + 0.6;
+                var rotX = Math.random();
+                var rotY = Math.random();
+                var rotZ = Math.random();
+                var rots = (Math.random() * 2 + 4) * 360;
                 confetti.classList.add("confetti");
-                confetti.style.setProperty("--size", `${Math.random() * 1.4 + 0.6}vw`);
-                confetti.style.setProperty("--x", `${Math.random() * 100}`);
-                confetti.style.setProperty("--rots", `${Math.random() * 4 + 2}`);
-                confetti.style.setProperty("--rotX", `${Math.random() * 360}`);
-                confetti.style.setProperty("--rotY", `${Math.random() * 360}`);
-                confetti.style.setProperty("--rotZ", `${Math.random() * 360}`);
+                confetti.style.left = Math.random() * 100 + "vw";
+                confetti.style.width = size + "vw";
+                confetti.style.height = size + "vw";
+                confetti.style.top = -size + "vw";
 
-                confetti.onanimationend = function () {
+                confetti.animate([
+                    {
+                        top: -size + "vw",
+                        transform: "rotate3d(" + rotX + ", " + rotY + ", " + rotZ + ", 0)"
+                    },
+                    {
+                        top: "calc(100vh + " + size + "vw)",
+                        transform: "rotate3d(" + rotX + ", " + rotY + ", " + rotZ + ", " + rots + "deg)"
+                    }
+                ], {
+                    duration: fromCss.confettiLifespan * 1000,
+                    easing: "ease-in"
+                });
+
+                // var transitionInterval = setInterval(function () {
+                //     confetti.setAttribute("top", String(size * -1));
+                // }, 1000 / 60);
+
+                setTimeout(function () {
                     confettiContainer.removeChild(confetti);
                     confettiCount--;
                     setTimeout(spawnConfetti.bind(null, false), Math.random() * confettiLifespan);
-                };
+                }, fromCss.confettiLifespan * 1000);
 
                 confettiContainer.appendChild(confetti);
                 confettiCount++;
@@ -558,7 +225,7 @@
                     };
 
                     request.send();
-                    setTimeout(rej, 10e3);
+                    setTimeout(rej, 10000);
                 });
             }
 
@@ -571,9 +238,9 @@
 
                 dayOfWeek.innerText = currentDate.toLocaleDateString("en-PH", { weekday: "long" });
                 clockDate.innerText = currentDate.toLocaleDateString("en-PH", { dateStyle: "long" });
-                hourCounter.innerText = hours < 10 ? `0${hours}` : hours;
-                minuteCounter.innerText = minutes < 10 ? `0${minutes}` : minutes;
-                secondCounter.innerText = seconds < 10 ? `0${seconds}` : seconds;
+                hourCounter.innerText = hours < 10 ? "0" + hours : hours;
+                minuteCounter.innerText = minutes < 10 ? "0" + minutes : minutes;
+                secondCounter.innerText = seconds < 10 ? "0" + seconds : seconds;
             }
 
             function updateCountdown(delta) {
@@ -583,10 +250,10 @@
                 var minutes = Math.floor((delta % (1000 * 60 * 60)) / (1000 * 60));
                 var seconds = Math.floor((delta % (1000 * 60)) / 1000);
 
-                dayCounter.innerText = days < 10 ? `0${days}` : days;
-                hourCounter.innerText = hours < 10 ? `0${hours}` : hours;
-                minuteCounter.innerText = minutes < 10 ? `0${minutes}` : minutes;
-                secondCounter.innerText = seconds < 10 ? `0${seconds}` : seconds;
+                dayCounter.innerText = days < 10 ? "0" + days : days;
+                hourCounter.innerText = hours < 10 ? "0" + hours : hours;
+                minuteCounter.innerText = minutes < 10 ? "0" + minutes : minutes;
+                secondCounter.innerText = seconds < 10 ? "0" + seconds : seconds;
             }
 
             function updateTime() {
@@ -637,7 +304,7 @@
              *   of endTimestamp.
              */
             function adjustClock(start) {
-                if (delta != null && delta < 60e3 * 15) {
+                if (delta != null && delta < 60000 * 15) {
                     return;
                 }
 
@@ -678,7 +345,7 @@
                     setInterval(function () {
                         // Check for new updates every 15 minutes
                         checkForUpdates();
-                    }, 60e3 * 15);
+                    }, 60000 * 15);
                 })
                 .catch(function () {
                     console.error("Failed to get latest revision SHA.");
@@ -688,18 +355,18 @@
             setInterval(function () {
                 // Re-adjust clock every one hour
                 adjustClock();
-            }, 60e3 * 60);
+            }, 60000 * 60);
 
             setTimeout(function () {
                 var timeNow = Date.now();
 
-                if (Math.abs(timeNow - lastKnownTime) > 15e3) {
+                if (Math.abs(timeNow - lastKnownTime) > 15000) {
                     // The clock moved forward or backward more than 15 seconds.
                     // Usually this means the local time changed. We'll need to
                     // do the offset fix again.
 
                     // If the delay isn't significant, set the delay back to zero.
-                    if (Math.abs(timeOffset) < 15e3) {
+                    if (Math.abs(timeOffset) < 15000) {
                         timeOffset = 0;
                     }
 
