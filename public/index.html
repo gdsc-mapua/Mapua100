@@ -310,32 +310,37 @@
                     }
 
                     console.log("Updating clock...");
+
+                    function finalizeClockAdjust() {
+                        if (previewTimeQuery) {
+                            console.log("Received preview time: " + previewTimeQuery);
+                            // Discard the time offset we got from the API and just use the
+                            // provided preview time.
+                            var previewTime = new Date(previewTimeQuery);
+                            if (!isNaN(previewTime.getTime())) {
+                                console.log("Starting clock at " + previewTime.toString());
+                                // Ensure that the time is valid first.
+                                timeOffset = previewTime - Date.now();
+                            } else {
+                                console.error("Preview time invalid. Falling back to system time.");
+                            }
+                        }
+
+                        mode = offsetTime(Date.now()) < transitionTimestamp
+                            ? "clock"
+                            : "countdown";
+                        body.classList.toggle("willTransition", mode === "clock");
+                        updateTime();
+                        setInterval(updateTime, 1000 / updateHz);
+                    }
                     fetchTimeOffset()
+                        .then(function () {
+                            finalizeClockAdjust();
+                        })
                         .catch(function () {
                             // Use system time. Can be incorrect!
                             timeOffset = 0;
-                        })
-                        .finally(function () {
-                            if (previewTimeQuery) {
-                                console.log("Received preview time: " + previewTimeQuery);
-                                // Discard the time offset we got from the API and just use the
-                                // provided preview time.
-                                var previewTime = new Date(previewTimeQuery);
-                                if (!isNaN(previewTime.getTime())) {
-                                    console.log("Starting clock at " + previewTime.toString());
-                                    // Ensure that the time is valid first.
-                                    timeOffset = previewTime - Date.now();
-                                } else {
-                                    console.error("Preview time invalid. Falling back to system time.");
-                                }
-                            }
-
-                            mode = offsetTime(Date.now()) < transitionTimestamp
-                                ? "clock"
-                                : "countdown";
-                            body.classList.toggle("willTransition", mode === "clock");
-                            updateTime();
-                            setInterval(updateTime, 1000 / updateHz);
+                            finalizeClockAdjust();
                         });
                 }
 
