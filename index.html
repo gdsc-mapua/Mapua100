@@ -434,6 +434,7 @@
             var bodyStyle = getComputedStyle(body);
 
             var currentVersionSha;
+            var delta;
             var timeOffset = 0;
             var lastKnownTime = Date.now();
             /** @type {"countdown"|"clock"} */
@@ -590,7 +591,7 @@
 
             function updateTime() {
                 var currentTimestamp = offsetTime(Date.now());
-                var delta = endTimestamp - currentTimestamp;
+                delta = endTimestamp - currentTimestamp;
 
                 // Check if the specified condition is met
                 if (currentTimestamp < transitionTimestamp) {
@@ -628,7 +629,19 @@
                 }
             }
 
-            function adjustClock() {
+            /**
+             * Adjust the clock to use actual time instead of system time.
+             * 
+             * @param {start} [string] Whether this is the start of execution.
+             *   If not, this function will not run if it is within 15 minutes
+             *   of endTimestamp.
+             */
+            function adjustClock(start) {
+                if (delta != null && delta < 60e3 * 15) {
+                    return;
+                }
+
+                console.log("Updating clock...");
                 fetchTimeOffset()
                     .catch(function () {
                         // Use system time. Can be incorrect!
@@ -671,7 +684,7 @@
                     console.error("Failed to get latest revision SHA.");
                     console.warn("Falling back to daily (http-equiv) updates!");
                 });
-            adjustClock();
+            adjustClock(true);
             setInterval(function () {
                 // Re-adjust clock every one hour
                 adjustClock();
