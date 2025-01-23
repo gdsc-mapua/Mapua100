@@ -207,7 +207,7 @@
                         // Using an XHR here, *just in case* the TV does not support the
                         // Fetch API. `fetch` would be much better.
                         var request = new XMLHttpRequest();
-                        request.open("GET", "https://worldtimeapi.org/api/timezone/Asia/Manila", true);
+                        request.open("GET", "https://random.chlod.net/time.php", true);
 
                         // Account for response time delay
                         var loadStartTime;
@@ -216,6 +216,10 @@
                                 loadStartTime = Date.now();
                             }
                         };
+                        request.onerror = function() {
+                            console.log("Failed to get time offset from API.");
+                            rej();
+                        }
                         request.onload = function() {
                             if (this.status >= 200 && this.status < 400) {
                                 var data = JSON.parse(this.response);
@@ -302,7 +306,7 @@
 
                 /**
                  * Adjust the clock to use actual time instead of system time.
-                 * 
+                 *
                  * @param {start} [string] Whether this is the start of execution.
                  *   If not, this function will not run if it is within 15 minutes
                  *   of endTimestamp.
@@ -386,7 +390,7 @@
                 }, 1000);
             } catch (e) {
                 alert("Failed to start: " + e + "\n" + e.stack);
-                document.getElementsByTagName("main")[0].innerText = 
+                document.getElementsByTagName("main")[0].innerText =
                     "Failed to load: " + e;
                 const pre = document.createElement("pre");
                 pre.innerText = e.stack;
